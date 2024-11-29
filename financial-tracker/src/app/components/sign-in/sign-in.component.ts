@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sign-in',
   standalone: true,
-  imports: [CommonModule, FormsModule, AngularFireAuthModule],
+  imports: [CommonModule, FormsModule, AngularFireAuthModule, RouterModule],
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.css'],
 })
