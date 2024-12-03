@@ -3,13 +3,13 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sign-in',
   standalone: true,
-  imports: [CommonModule, FormsModule, AngularFireAuthModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
+  providers: [AuthService],
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.css'],
 })
@@ -22,8 +22,9 @@ export class SignInComponent {
 
   async onSubmit() {
     try {
+      console.log('Attempting sign in...');
       await this.authService.signIn(this.email, this.password);
-      this.router.navigate(['/dashboard']); // Navigate to dashboard after login
+      this.router.navigate(['/home']);
     } catch (error: any) {
       this.error = error.message;
     }

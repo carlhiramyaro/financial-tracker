@@ -1,34 +1,51 @@
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Observable } from 'rxjs';
+import {
+  Auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+} from '@angular/fire/auth';
+import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  user$: Observable<any>;
-
-  constructor(private auth: AngularFireAuth) {
-    this.user$ = this.auth.authState;
-  }
+  constructor(private auth: Auth) {}
 
   async signIn(email: string, password: string) {
     try {
-      return await this.auth.signInWithEmailAndPassword(email, password);
+      console.log('AuthService: Attempting sign in...'); // Debug log
+      const result = await signInWithEmailAndPassword(
+        this.auth,
+        email,
+        password
+      );
+      console.log('AuthService: Sign in successful', result); // Debug log
+      return result;
     } catch (error) {
+      console.error('AuthService: Sign in error', error); // Debug log
       throw error;
     }
   }
 
   async signUp(email: string, password: string) {
     try {
-      return await this.auth.createUserWithEmailAndPassword(email, password);
+      console.log('AuthService: Attempting sign up...'); // Debug log
+      const result = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password
+      );
+      console.log('AuthService: Sign up successful', result); // Debug log
+      return result;
     } catch (error) {
+      console.error('AuthService: Sign up error', error); // Debug log
       throw error;
     }
   }
 
   async signOut() {
-    await this.auth.signOut();
+    return await signOut(this.auth);
   }
 }
