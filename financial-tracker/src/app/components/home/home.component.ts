@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { ExpenseService } from '../../services/expense.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
@@ -15,19 +17,30 @@ export class HomeComponent {
   description: string = '';
   date: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private expenseService: ExpenseService) {}
 
-  navigateTo(route: string) {
-    // This will be implemented when you add these routes
-    this.router.navigate([`/${route}`]);
-  }
+  async submitExpense() {
+    try {
+      if (!this.amount || !this.description || !this.date) {
+        alert('Please fill in all fields');
+        return;
+      }
 
-  proceedToCategory() {
-    // Implementation will go here
-    console.log('Proceeding with:', {
-      amount: this.amount,
-      description: this.description,
-      date: this.date,
-    });
+      await this.expenseService.addExpense({
+        amount: this.amount,
+        category: this.description,
+        date: this.date,
+      });
+
+      // Clear the form
+      this.amount = 0;
+      this.description = '';
+      this.date = '';
+
+      alert('Expense submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting expense:', error);
+      alert('Error submitting expense. Please try again.');
+    }
   }
 }
