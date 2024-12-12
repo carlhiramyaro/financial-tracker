@@ -24,7 +24,7 @@ export class SignUpComponent {
     try {
       const result = await this.authService.signUp(this.email, this.password);
       console.log('SignUpComponent: Sign up successful', result); // Debug log
-      this.router.navigate(['/home']);
+      this.router.navigate(['/onboarding']);
     } catch (error: any) {
       console.error('SignUpComponent: Sign up error', error); // Debug log
       this.error = error.message;
