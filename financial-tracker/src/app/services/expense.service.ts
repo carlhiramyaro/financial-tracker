@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+} from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 
 export interface Expense {
@@ -33,6 +40,25 @@ export class ExpenseService {
       return docRef;
     } catch (error) {
       console.error('Error adding expense:', error);
+      throw error;
+    }
+  }
+
+  async getExpenses(): Promise<Expense[]> {
+    try {
+      const userId = this.auth.currentUser?.uid;
+      if (!userId) throw new Error('No user logged in');
+
+      const expensesRef = collection(this.firestore, 'expenses');
+      const q = query(expensesRef, where('userId', '==', userId));
+      const querySnapshot = await getDocs(q);
+
+      return querySnapshot.docs.map((doc) => {
+        const data = doc.data() as Expense;
+        return data;
+      });
+    } catch (error) {
+      console.error('Error getting expenses:', error);
       throw error;
     }
   }
