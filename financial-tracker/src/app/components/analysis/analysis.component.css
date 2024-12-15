@@ -47,4 +47,23 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.chart-container h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
 } 
