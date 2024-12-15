@@ -14,27 +14,31 @@ import { ExpenseService } from '../../services/expense.service';
 })
 export class HomeComponent {
   amount: number = 0;
+  category: string = '';
   description: string = '';
+  details: string = '';
   date: string = '';
 
   constructor(private router: Router, private expenseService: ExpenseService) {}
 
   async submitExpense() {
     try {
-      if (!this.amount || !this.description || !this.date) {
+      if (!this.amount || !this.category || !this.date || !this.details) {
         alert('Please fill in all fields');
         return;
       }
 
       await this.expenseService.addExpense({
         amount: this.amount,
-        category: this.description,
+        category: this.category,
+        details: this.details,
         date: this.date,
       });
 
       // Clear the form
       this.amount = 0;
-      this.description = '';
+      this.category = '';
+      this.details = '';
       this.date = '';
 
       alert('Expense submitted successfully!');

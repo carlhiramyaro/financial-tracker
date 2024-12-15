@@ -108,3 +108,16 @@ select.form-control:focus {
   outline: none;
   border-color: #9333EA;
 }
+
+/* Add this to your existing CSS */
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+textarea.form-control:focus {
+  outline: none;
+  border-color: #9333EA;
+}
