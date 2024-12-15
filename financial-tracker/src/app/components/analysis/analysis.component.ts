@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ExpenseService, Expense } from '../../services/expense.service';
 import { UserService } from '../../services/user.service';
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables, ChartEvent } from 'chart.js';
 
 Chart.register(...registerables);
 
@@ -17,6 +17,9 @@ Chart.register(...registerables);
 export class AnalysisComponent implements OnInit {
   private barChart: Chart | undefined;
   private pieChart: Chart | undefined;
+  selectedCategory: string | null = null;
+  filteredExpenses: Expense[] = [];
+  currentMonthExpenses: Expense[] = [];
 
   constructor(
     private expenseService: ExpenseService,
@@ -93,8 +96,8 @@ export class AnalysisComponent implements OnInit {
     const monthlyIncome = (await this.userService.getUserIncome()) || 0;
     const currentMonth = new Date().getMonth();
 
-    // Filter expenses for current month
-    const currentMonthExpenses = expenses.filter(
+    // Store current month expenses for later use
+    this.currentMonthExpenses = expenses.filter(
       (expense) => new Date(expense.date).getMonth() === currentMonth
     );
 
@@ -102,7 +105,7 @@ export class AnalysisComponent implements OnInit {
     const categoryTotals = new Map<string, number>();
     let totalSpent = 0;
 
-    currentMonthExpenses.forEach((expense) => {
+    this.currentMonthExpenses.forEach((expense) => {
       const current = categoryTotals.get(expense.category) || 0;
       categoryTotals.set(expense.category, current + expense.amount);
       totalSpent += expense.amount;
@@ -156,6 +159,13 @@ export class AnalysisComponent implements OnInit {
             },
           },
         },
+        onClick: (event: ChartEvent, elements: any[]) => {
+          if (elements.length > 0) {
+            const index = elements[0].index;
+            const category = labels[index];
+            this.showCategoryDetails(category);
+          }
+        },
       },
     });
   }
@@ -177,5 +187,20 @@ export class AnalysisComponent implements OnInit {
     }
 
     return colors.slice(0, count);
+  }
+
+  showCategoryDetails(category: string) {
+    this.selectedCategory = category;
+    this.filteredExpenses = this.currentMonthExpenses.filter(
+      (expense) => expense.category === category
+    );
+    // Sort expenses by date
+    this.filteredExpenses.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }
+
+  backToPieChart() {
+    this.selectedCategory = null;
   }
 }
