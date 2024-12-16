@@ -1,33 +1,42 @@
-<div class="sign-up-container">
-  <h2>Sign Up</h2>
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Create your account</h2>
+    <div class="subtitle">Join thousands of users managing their finances better</div>
 
-  <form (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input
-        type="email"
-        id="email"
-        [(ngModel)]="email"
-        name="email"
-        required
-      />
-    </div>
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          placeholder="Enter your email"
+        />
+        <i class="fas fa-envelope"></i>
+      </div>
 
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input
-        type="password"
-        id="password"
-        [(ngModel)]="password"
-        name="password"
-        required
-      />
-    </div>
+      <div class="form-group">
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          placeholder="Choose a password"
+        />
+        <i class="fas fa-lock"></i>
+      </div>
 
-    <div class="error" *ngIf="error">{{ error }}</div>
+      <div class="error" *ngIf="error">{{ error }}</div>
 
-    <button type="submit">Sign Up</button>
-  </form>
+      <button type="submit">Create Account</button>
 
-  <p>Already have an account? <a routerLink="/sign-in">Sign In</a></p>
+      <div class="divider">or</div>
+
+      <div class="auth-footer">
+        Already have an account? <a routerLink="/sign-in">Sign In</a>
+      </div>
+    </form>
+  </div>
 </div>

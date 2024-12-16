@@ -6,21 +6,15 @@
     <div class="nav-links">
       <a routerLink="/home" class="nav-link">Home</a>
       <a routerLink="/analysis" class="nav-link">Analysis</a>
-      <a routerLink="/history" class="nav-link">History</a>
+      <a routerLink="/settings" class="nav-link">Settings</a>
+      <button class="logout-btn" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
     </div>
   </nav>
   <div class="expense-form">
     <h2>Log Your Expense</h2>
-
-    <div class="form-group">
-      <label>Amount Spent</label>
-      <input
-        type="number"
-        [(ngModel)]="amount"
-        placeholder="138"
-        class="form-control"
-      />
-    </div>
 
     <div class="form-group">
       <label>Category</label>
@@ -32,15 +26,24 @@
         <option value="Health and Wellness">Health and Wellness</option>
         <option value="Debt Repayment">Debt Repayment</option>
         <option value="Savings and Investments">Savings and Investments</option>
-        <option value="Entertainment and Recreation">
-          Entertainment and Recreation
-        </option>
-        <option value="Education and Self-Development">
-          Education and Self-Development
-        </option>
-        <option value="Family and Childcare">Family and Childcare</option>
+        <option value="Entertainment">Entertainment</option>
+        <option value="Education">Education</option>
+        <option value="Family">Family</option>
         <option value="Miscellaneous">Miscellaneous</option>
       </select>
+    </div>
+
+    <div class="form-group">
+      <label>Amount Spent</label>
+      <input
+        type="number"
+        [(ngModel)]="amount"
+        placeholder="0"
+        class="form-control"
+        min="0"
+        step="0.01"
+        (input)="validateAmount($event)"
+      />
     </div>
 
     <div class="form-group">
@@ -58,13 +61,25 @@
       <input
         type="date"
         [(ngModel)]="date"
-        placeholder="YYYY-MM-DD"
         class="form-control"
+        [max]="currentDate"
       />
     </div>
 
-    <button class="proceed-btn" (click)="submitExpense()">
+    <button 
+      class="proceed-btn" 
+      [class.loading]="isSubmitting" 
+      (click)="submitExpense()"
+      [disabled]="isSubmitting"
+    >
       Submit Expense
     </button>
+
+    <app-toast 
+      [show]="showToast"
+      [message]="toastMessage"
+      type="success"
+      (closeToast)="closeToast()"
+    ></app-toast>
   </div>
 </div>

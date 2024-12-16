@@ -1,32 +1,46 @@
-<nav class="top-nav">
-  <div class="nav-brand">
-    <span>SpendWise</span>
-  </div>
-  <div class="nav-links">
-    <a routerLink="/home" class="nav-link">Home</a>
-    <a routerLink="/analysis" class="nav-link">Analysis</a>
-    <a routerLink="/history" class="nav-link">History</a>
-  </div>
-</nav>
 <div class="content-container">
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <span>SpendWise</span>
+    </div>
+    <div class="nav-links">
+      <a routerLink="/home" class="nav-link">Home</a>
+      <a routerLink="/analysis" class="nav-link">Analysis</a>
+      <a routerLink="/settings" class="nav-link">Settings</a>
+      <button class="logout-btn" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </nav>
+
   <div class="charts-grid">
     <div class="chart-container">
       <h2>Monthly Expenses Overview</h2>
-      <canvas id="monthlyExpensesChart"></canvas>
+      <div *ngIf="!barChart" class="loading-spinner"></div>
+      <div class="canvas-container">
+        <canvas id="monthlyExpensesChart"></canvas>
+      </div>
     </div>
+
     <div class="chart-container">
       <div *ngIf="!selectedCategory; else categoryDetails">
         <h2>Current Month Breakdown</h2>
-        <canvas id="monthlyBreakdownChart"></canvas>
+        <div *ngIf="!pieChart" class="loading-spinner"></div>
+        <div class="canvas-container">
+          <canvas id="monthlyBreakdownChart"></canvas>
+        </div>
       </div>
+
       <ng-template #categoryDetails>
         <div class="category-details">
           <div class="category-header">
             <button class="back-btn" (click)="backToPieChart()">
-              ← Back to Chart
+              <i class="fas fa-arrow-left"></i> Back to Chart
             </button>
             <h2>{{ selectedCategory }} Expenses</h2>
           </div>
+
           <div class="table-container">
             <table class="expenses-table">
               <thead>
@@ -38,9 +52,12 @@
               </thead>
               <tbody>
                 <tr *ngFor="let expense of filteredExpenses">
-                  <td>{{ expense.date | date : "mediumDate" }}</td>
+                  <td>{{ expense.date | date:'mediumDate' }}</td>
                   <td>${{ expense.amount.toFixed(2) }}</td>
                   <td>{{ expense.details }}</td>
+                </tr>
+                <tr *ngIf="filteredExpenses.length === 0">
+                  <td colspan="3" class="text-center">No expenses found for this category</td>
                 </tr>
               </tbody>
             </table>

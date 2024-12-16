@@ -1,27 +1,35 @@
 <div class="onboarding-container">
-  <div class="onboarding-form">
+  <div class="onboarding-card">
     <h2>Welcome to SpendWise!</h2>
-    <p class="subtitle">
-      To help you track your expenses better, please tell us your monthly
-      income.
-    </p>
+    <div class="subtitle">
+      To help you track your expenses better, please tell us your monthly income.
+    </div>
 
     <form (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="monthlyIncome">Monthly Income</label>
-        <input
-          type="number"
-          id="monthlyIncome"
-          [(ngModel)]="monthlyIncome"
-          name="monthlyIncome"
-          placeholder="Enter your monthly income"
-          required
-        />
+        <div class="input-wrapper">
+          <span class="currency-symbol">$</span>
+          <input
+            type="number"
+            id="monthlyIncome"
+            [(ngModel)]="monthlyIncome"
+            name="monthlyIncome"
+            placeholder="Enter your monthly income"
+            required
+            class="form-control"
+            min="0"
+            step="0.01"
+            (input)="validateInput($event)"
+          />
+        </div>
       </div>
 
       <div class="error" *ngIf="error">{{ error }}</div>
 
-      <button type="submit" class="submit-btn">Continue</button>
+      <button type="submit" class="proceed-btn" [disabled]="!monthlyIncome">
+        Continue
+      </button>
     </form>
   </div>
 </div>

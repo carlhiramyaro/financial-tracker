@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import {
   Firestore,
   collection,
@@ -22,36 +23,70 @@ export interface Expense {
   providedIn: 'root',
 })
 export class ExpenseService {
-  constructor(private firestore: Firestore, private auth: Auth) {}
+  private expensesSubject = new BehaviorSubject<Expense[]>([]);
+
+  constructor(private firestore: Firestore, private auth: Auth) {
+    // Initialize expenses
+    this.refreshExpenses();
+  }
+
+  private async refreshExpenses() {
+    try {
+      const expenses = await this.getExpenses();
+      this.expensesSubject.next(expenses);
+    } catch (error) {
+      console.error('Error refreshing expenses:', error);
+    }
+  }
+
+  getExpensesObservable(): Observable<Expense[]> {
+    return this.expensesSubject.asObservable();
+  }
 
   async addExpense(expense: Omit<Expense, 'userId' | 'timestamp'>) {
     try {
-      const userId = this.auth.currentUser?.uid;
-      if (!userId) throw new Error('No user logged in');
-
-      const expenseWithMetadata = {
-        ...expense,
-        userId,
-        timestamp: new Date(),
-      };
-
-      const expensesRef = collection(this.firestore, 'expenses');
-      const docRef = await addDoc(expensesRef, expenseWithMetadata);
-      console.log('Expense added successfully with ID:', docRef.id);
-      return docRef;
+      const result = await this.addExpenseToFirestore(expense);
+      // Refresh expenses after adding new one
+      await this.refreshExpenses();
+      return result;
     } catch (error) {
       console.error('Error adding expense:', error);
       throw error;
     }
   }
 
+  private async addExpenseToFirestore(expense: Omit<Expense, 'userId' | 'timestamp'>) {
+    const userId = this.auth.currentUser?.uid;
+    if (!userId) throw new Error('No user logged in');
+
+    const expenseWithMetadata = {
+      ...expense,
+      userId,
+      timestamp: new Date(),
+    };
+
+    const expensesRef = collection(this.firestore, 'expenses');
+    const docRef = await addDoc(expensesRef, expenseWithMetadata);
+    console.log('Expense added successfully with ID:', docRef.id);
+    return docRef;
+  }
+
   async getExpenses(): Promise<Expense[]> {
     try {
-      const userId = this.auth.currentUser?.uid;
-      if (!userId) throw new Error('No user logged in');
+      // Wait for auth state to be ready
+      const user = await new Promise<any>((resolve) => {
+        const unsubscribe = this.auth.onAuthStateChanged(user => {
+          unsubscribe();
+          resolve(user);
+        });
+      });
+
+      if (!user) {
+        throw new Error('No user logged in');
+      }
 
       const expensesRef = collection(this.firestore, 'expenses');
-      const q = query(expensesRef, where('userId', '==', userId));
+      const q = query(expensesRef, where('userId', '==', user.uid));
       const querySnapshot = await getDocs(q);
 
       return querySnapshot.docs.map((doc) => {

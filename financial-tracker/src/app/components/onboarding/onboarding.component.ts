@@ -25,9 +25,23 @@ export class OnboardingComponent {
       }
 
       await this.userService.setUserIncome(this.monthlyIncome);
-      this.router.navigate(['/home']);
+      const isUpdate = localStorage.getItem('hasCompletedOnboarding');
+      if (isUpdate) {
+        this.router.navigate(['/settings']);
+      } else {
+        localStorage.setItem('hasCompletedOnboarding', 'true');
+        this.router.navigate(['/home']);
+      }
     } catch (error: any) {
       this.error = error.message;
+    }
+  }
+
+  validateInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.value && parseFloat(input.value) < 0) {
+      input.value = '0';
+      this.monthlyIncome = 0;
     }
   }
 }

@@ -1,1 +1,485 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Add Google Font import at the top of the file */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* Add at the top of the file */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Update the html and body styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  height: 100%;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #c2db65 0%, #a8c653 100%);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Auth Form Styles */
+* {
+  font-family: 'Inter', sans-serif;
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c2db65 0%, #a8c653 100%);
+  padding: 20px;
+}
+
+.auth-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 520px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+}
+
+.auth-card h2 {
+  text-align: center;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  text-align: center;
+  color: #718096;
+  font-size: 0.938rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.938rem;
+  background-color: #f0f4f8;
+  transition: all 0.2s;
+}
+
+.form-group input:hover {
+  background-color: #e6eaf0;
+}
+
+.form-group input:focus {
+  outline: none;
+  background-color: #e6eaf0;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.form-group input::placeholder {
+  color: #718096;
+}
+
+.form-group label {
+  display: none;
+}
+
+.form-group i {
+  color: #718096;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  position: static;
+  transform: none;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 1rem;
+  background-color: #8B5CF6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.938rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 2rem;
+  letter-spacing: 0.025em;
+  position: relative;
+  overflow: hidden;
+}
+
+button[type="submit"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+button[type="submit"]:hover::after {
+  transform: translateX(0);
+}
+
+/* Add loading state for button */
+button[type="submit"].loading {
+  position: relative;
+  color: transparent;
+}
+
+button[type="submit"].loading::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid white;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+button[type="submit"]:hover {
+  background-color: #7C3AED;
+  transform: translateY(-1px);
+}
+
+button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+.error {
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.divider {
+  text-align: center;
+  margin: 2rem 0;
+  color: #718096;
+  font-size: 0.875rem;
+  position: relative;
+}
+
+/* Add lines to the divider */
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: #e2e8f0;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 2rem;
+  color: #718096;
+  font-size: 0.875rem;
+}
+
+.auth-footer a {
+  color: #2d3748;
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+.auth-footer a:hover {
+  color: #1a202c;
+  text-decoration: underline;
+}
+
+/* Update container styles */
+.home-container,
+.content-container,
+.auth-container {
+  min-height: 100vh;
+  height: 100%;
+  padding: 20px;
+  margin: 0;
+  background: linear-gradient(135deg, #c2db65 0%, #a8c653 100%);
+}
+
+body.dark-mode {
+  background: linear-gradient(135deg, #1a1c2c 0%, #161823 100%);
+  color: #e2e8f0;
+}
+
+body.dark-mode .auth-card,
+body.dark-mode .expense-form,
+body.dark-mode .settings-card,
+body.dark-mode .chart-container,
+body.dark-mode .top-nav {
+  background: #2d3748;
+}
+
+/* Improve text visibility in dark mode */
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode .current-income,
+body.dark-mode .form-group label,
+body.dark-mode .theme-toggle span {
+  color: #f7fafc !important;  /* Bright white */
+}
+
+body.dark-mode .subtitle,
+body.dark-mode .nav-link {
+  color: #e2e8f0;  /* Light gray */
+}
+
+body.dark-mode .form-control {
+  background-color: #1a202c;
+  color: #f7fafc;  /* Bright white for input text */
+}
+
+body.dark-mode .form-control::placeholder {
+  color: #a0aec0;  /* Lighter gray for placeholders */
+}
+
+body.dark-mode .form-control:hover {
+  background-color: #2d3748;
+}
+
+body.dark-mode .nav-link:hover {
+  color: #ffffff;  /* Pure white on hover */
+}
+
+/* Make error messages more visible in dark mode */
+body.dark-mode .error {
+  color: #fc8181;  /* Lighter red for better contrast */
+}
+
+/* Adjust the toggle switch colors */
+body.dark-mode .slider {
+  background-color: #4a5568;  /* Darker gray for switch background */
+}
+
+body.dark-mode .slider:before {
+  background-color: #f7fafc;  /* Bright white for switch handle */
+}
+
+/* Add these styles to your dark mode section */
+body.dark-mode .nav-brand span {
+  color: #f7fafc !important;  /* Make logo bright white */
+}
+
+body.dark-mode .fas,  /* Font Awesome icons */
+body.dark-mode .logout-btn i,
+body.dark-mode .form-group i {
+  color: #f7fafc !important;  /* Make icons bright white */
+}
+
+body.dark-mode .logout-btn {
+  color: #f7fafc;  /* Make logout text bright white */
+}
+
+body.dark-mode .logout-btn:hover {
+  color: #fc8181;  /* Keep the red hover state but make it lighter */
+}
+
+/* Make calendar icon and other input icons visible */
+body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);  /* Invert calendar icon color to make it white */
+}
+
+body.dark-mode select {
+  color: #f7fafc;  /* Make select text white */
+}
+
+/* Make dropdown arrow visible */
+body.dark-mode select.form-control {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f7fafc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* Dark mode styles for onboarding page */
+body.dark-mode .onboarding-card {
+  background: #2d3748;
+  color: #f7fafc;
+}
+
+body.dark-mode .onboarding-card h2 {
+  color: #f7fafc !important;
+}
+
+body.dark-mode .onboarding-card .subtitle {
+  color: #e2e8f0;
+}
+
+body.dark-mode .onboarding-card .form-group label {
+  color: #f7fafc !important;
+}
+
+body.dark-mode .onboarding-card .form-control {
+  background-color: #1a202c;
+  color: #f7fafc;
+}
+
+body.dark-mode .onboarding-card .form-control:hover {
+  background-color: #2d3748;
+}
+
+body.dark-mode .onboarding-card .form-control:focus {
+  box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.2);
+}
+
+body.dark-mode .onboarding-card .proceed-btn {
+  background-color: #9333ea;
+  color: #f7fafc;
+}
+
+body.dark-mode .onboarding-card .proceed-btn:hover {
+  background-color: #7e22ce;
+}
+
+body.dark-mode .onboarding-card .currency-symbol {
+  color: #f7fafc;
+}
+
+/* Make sure the background gradient is applied to the container */
+body.dark-mode .onboarding-container {
+  background: linear-gradient(135deg, #1a1c2c 0%, #161823 100%);
+}
+
+/* Add these styles for chart visibility in dark mode */
+body.dark-mode .chart-container h2,
+body.dark-mode .chart-container text {
+  color: #f7fafc !important;  /* Bright white for chart titles and text */
+}
+
+/* Make axis labels and values more visible */
+body.dark-mode .chart-container .chartjs-axis-title,
+body.dark-mode .chart-container .chartjs-tick {
+  color: #f7fafc !important;
+}
+
+/* Make chart legends more visible */
+body.dark-mode .chart-container .chartjs-legend-item span {
+  color: #f7fafc !important;
+}
+
+/* Make chart grid lines slightly visible but not intrusive */
+body.dark-mode .chart-container .chartjs-grid-line {
+  stroke: rgba(247, 250, 252, 0.1) !important;  /* Very subtle white */
+}
+
+/* Make axis lines more visible */
+body.dark-mode .chart-container .chartjs-axis-line {
+  stroke: rgba(247, 250, 252, 0.4) !important;  /* More visible white */
+}
+
+/* Make sure monthly expenses text is visible */
+body.dark-mode .chart-container .chartjs-legend-item-text {
+  color: #f7fafc !important;
+}
+
+/* Make pie chart labels more visible */
+body.dark-mode .chart-container .chartjs-doughnut-legend-item span,
+body.dark-mode .chart-container .chartjs-pie-legend-item span {
+  color: #f7fafc !important;
+}
+
+/* Make tooltips more visible in dark mode */
+body.dark-mode .chartjs-tooltip {
+  background: #2d3748 !important;
+  color: #f7fafc !important;
+  border: 1px solid rgba(247, 250, 252, 0.1);
+}
+
+/* Make sign up link more visible in dark mode */
+body.dark-mode .auth-footer a {
+  color: #f7fafc !important;  /* Bright white */
+}
+
+body.dark-mode .auth-footer a:hover {
+  color: #c2db65 !important;  /* Light green on hover */
+  text-decoration: none;
+}
+
+/* Update button colors to purple */
+.proceed-btn,
+.settings-btn,
+button[type="submit"] {
+  background-color: #8B5CF6;  /* Purple */
+  color: white;
+}
+
+.proceed-btn:hover,
+.settings-btn:hover,
+button[type="submit"]:hover {
+  background-color: #7C3AED;  /* Darker purple on hover */
+}
+
+/* Keep the focus state with purple */
+.form-control:focus {
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);  /* Purple shadow */
+}
+
+/* Update toggle switch to purple */
+input:checked + .slider {
+  background-color: #8B5CF6;
+}
+
+/* Dark mode button adjustments */
+body.dark-mode .proceed-btn,
+body.dark-mode .settings-btn,
+body.dark-mode button[type="submit"] {
+  background-color: #8B5CF6;
+  color: white;
+}
+
+body.dark-mode .proceed-btn:hover,
+body.dark-mode .settings-btn:hover,
+body.dark-mode button[type="submit"]:hover {
+  background-color: #7C3AED;
+}
+
+/* Keep the loading state for buttons */
+button[type="submit"].loading::before {
+  border-color: white;  /* Make loading spinner white for contrast */
+  border-top-color: transparent;
+}
