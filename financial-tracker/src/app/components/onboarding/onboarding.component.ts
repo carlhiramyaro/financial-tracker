@@ -25,13 +25,8 @@ export class OnboardingComponent {
       }
 
       await this.userService.setUserIncome(this.monthlyIncome);
-      const isUpdate = localStorage.getItem('hasCompletedOnboarding');
-      if (isUpdate) {
-        this.router.navigate(['/settings']);
-      } else {
-        localStorage.setItem('hasCompletedOnboarding', 'true');
-        this.router.navigate(['/home']);
-      }
+      localStorage.setItem('hasCompletedOnboarding', 'true');
+      this.router.navigate(['/home']);
     } catch (error: any) {
       this.error = error.message;
     }
