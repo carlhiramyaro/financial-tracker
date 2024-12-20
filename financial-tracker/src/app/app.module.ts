@@ -8,6 +8,11 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { SignInComponent } from '././components/sign-in/sign-in.component';
+import { initializeApp } from 'firebase/app';
+import { getStorage } from 'firebase/storage';
+
+const app = initializeApp(environment.firebase);
+const storage = getStorage(app);
 
 bootstrapApplication(AppComponent, {
   providers: [

@@ -1,14 +1,6 @@
 {
-  "emulators": {
-    "dataconnect": {
-      "dataDir": "dataconnect/.dataconnect/pgliteData"
-    }
-  },
-  "dataconnect": {
-    "source": "dataconnect"
-  },
   "hosting": {
-    "public": "dist/[spend-wise-finance-tracker]",
+    "public": "dist/financial-tracker/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
