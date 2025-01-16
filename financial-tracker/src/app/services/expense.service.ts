@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {
   Firestore,
@@ -7,6 +7,8 @@ import {
   query,
   where,
   getDocs,
+  onSnapshot,
+  Query,
 } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 
@@ -22,20 +24,54 @@ export interface Expense {
 @Injectable({
   providedIn: 'root',
 })
-export class ExpenseService {
+export class ExpenseService implements OnDestroy {
   private expensesSubject = new BehaviorSubject<Expense[]>([]);
+  private unsubscribe?: () => void;
 
   constructor(private firestore: Firestore, private auth: Auth) {
-    // Initialize expenses
-    this.refreshExpenses();
+    this.setupExpensesListener();
   }
 
-  private async refreshExpenses() {
-    try {
-      const expenses = await this.getExpenses();
-      this.expensesSubject.next(expenses);
-    } catch (error) {
-      console.error('Error refreshing expenses:', error);
+  private setupExpensesListener() {
+    // Clear any existing listener
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+
+    // Add auth state listener
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        const expensesRef = collection(this.firestore, 'expenses');
+        const q = query(expensesRef, where('userId', '==', user.uid));
+
+        this.unsubscribe = onSnapshot(
+          q,
+          (querySnapshot) => {
+            const expenses = querySnapshot.docs.map((doc) => {
+              return { ...(doc.data() as Expense) };
+            });
+            this.expensesSubject.next(expenses);
+          },
+          (error) => {
+            console.error('Error listening to expenses:', error);
+            // Handle the error gracefully
+            this.expensesSubject.next([]);
+          }
+        );
+      } else {
+        // No user is signed in, clear the expenses
+        this.expensesSubject.next([]);
+        if (this.unsubscribe) {
+          this.unsubscribe();
+        }
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    // Clean up listener when service is destroyed
+    if (this.unsubscribe) {
+      this.unsubscribe();
     }
   }
 
@@ -46,8 +82,7 @@ export class ExpenseService {
   async addExpense(expense: Omit<Expense, 'userId' | 'timestamp'>) {
     try {
       const result = await this.addExpenseToFirestore(expense);
-      // Refresh expenses after adding new one
-      await this.refreshExpenses();
+      // The expenses will automatically refresh via the onSnapshot listener
       return result;
     } catch (error) {
       console.error('Error adding expense:', error);
@@ -55,7 +90,9 @@ export class ExpenseService {
     }
   }
 
-  private async addExpenseToFirestore(expense: Omit<Expense, 'userId' | 'timestamp'>) {
+  private async addExpenseToFirestore(
+    expense: Omit<Expense, 'userId' | 'timestamp'>
+  ) {
     const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('No user logged in');
 
@@ -75,7 +112,7 @@ export class ExpenseService {
     try {
       // Wait for auth state to be ready
       const user = await new Promise<any>((resolve) => {
-        const unsubscribe = this.auth.onAuthStateChanged(user => {
+        const unsubscribe = this.auth.onAuthStateChanged((user) => {
           unsubscribe();
           resolve(user);
         });

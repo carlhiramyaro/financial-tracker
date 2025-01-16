@@ -6,6 +6,7 @@ import { UserService } from '../../services/user.service';
 import { Chart, registerables, ChartEvent } from 'chart.js';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 Chart.register(...registerables);
 
@@ -23,6 +24,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
   filteredExpenses: Expense[] = [];
   currentMonthExpenses: Expense[] = [];
   private expenseSubscription: any;
+  private expensesSubscription?: Subscription;
 
   constructor(
     private expenseService: ExpenseService,
@@ -35,43 +37,53 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     this.createMonthlyExpensesChart();
     this.createMonthlyBreakdownChart();
 
-    this.expenseSubscription = this.expenseService.getExpensesObservable().subscribe(expenses => {
-      if (this.barChart) {
-        this.updateBarChart(expenses);
-      }
-      if (this.pieChart) {
-        this.updatePieChart(expenses);
-      }
-    });
+    this.expensesSubscription = this.expenseService
+      .getExpensesObservable()
+      .subscribe({
+        next: (expenses) => {
+          if (this.barChart) {
+            this.updateBarChart(expenses);
+          }
+          if (this.pieChart) {
+            this.updatePieChart(expenses);
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching expenses:', error);
+          // Handle the error in the UI (show error message, etc.)
+        },
+      });
   }
 
   ngOnDestroy() {
     if (this.expenseSubscription) {
       this.expenseSubscription.unsubscribe();
     }
+    if (this.expensesSubscription) {
+      this.expensesSubscription.unsubscribe();
+    }
   }
 
   private async updateBarChart(expenses: Expense[]) {
-    const monthlyIncome = await this.userService.getUserIncome() || 0;
+    const monthlyIncome = (await this.userService.getUserIncome()) || 0;
     const monthlyTotals = this.calculateMonthlyTotals(expenses);
-    
+
     if (this.barChart) {
       this.barChart.data.datasets[0].data = monthlyTotals;
-      this.barChart.data.datasets[0].backgroundColor = monthlyTotals.map(total => 
-        total > monthlyIncome 
-          ? 'rgba(239, 68, 68, 0.5)' 
-          : 'rgba(147, 51, 234, 0.5)'
+      this.barChart.data.datasets[0].backgroundColor = monthlyTotals.map(
+        (total) =>
+          total > monthlyIncome
+            ? 'rgba(239, 68, 68, 0.5)'
+            : 'rgba(147, 51, 234, 0.5)'
       );
-      this.barChart.data.datasets[0].borderColor = monthlyTotals.map(total => 
-        total > monthlyIncome 
-          ? 'rgba(239, 68, 68, 1)' 
-          : 'rgba(147, 51, 234, 1)'
+      this.barChart.data.datasets[0].borderColor = monthlyTotals.map((total) =>
+        total > monthlyIncome ? 'rgba(239, 68, 68, 1)' : 'rgba(147, 51, 234, 1)'
       );
       this.barChart.data.datasets[1].data = Array(12).fill(monthlyIncome);
       if (this.barChart.options.scales) {
         this.barChart.options.scales['y'] = {
           ...this.barChart.options.scales['y'],
-          suggestedMax: monthlyIncome * 1.2
+          suggestedMax: monthlyIncome * 1.2,
         };
       }
       this.barChart.update();
@@ -99,7 +111,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
       this.currentMonthExpenses.forEach((expense) => {
         const normalizedCategory = expense.category.trim();
         console.log('Processing category:', normalizedCategory);
-        
+
         const current = categoryTotals.get(normalizedCategory) || 0;
         categoryTotals.set(normalizedCategory, current + expense.amount);
         totalSpent += expense.amount;
@@ -118,16 +130,20 @@ export class AnalysisComponent implements OnInit, OnDestroy {
       console.log('Chart labels:', labels);
       console.log('Chart data:', data);
 
-      const ctx = document.getElementById('monthlyBreakdownChart') as HTMLCanvasElement;
+      const ctx = document.getElementById(
+        'monthlyBreakdownChart'
+      ) as HTMLCanvasElement;
       this.pieChart = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: labels,
-          datasets: [{
-            data: data,
-            backgroundColor: this.generateColors(labels.length),
-            borderWidth: 1,
-          }]
+          datasets: [
+            {
+              data: data,
+              backgroundColor: this.generateColors(labels.length),
+              borderWidth: 1,
+            },
+          ],
         },
         options: {
           responsive: true,
@@ -139,12 +155,12 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             },
             tooltip: {
               callbacks: {
-                label: function(context) {
+                label: function (context) {
                   const value = context.raw as number;
                   return `${context.label}: $${value.toFixed(2)}`;
-                }
-              }
-            }
+                },
+              },
+            },
           },
           onClick: (event: ChartEvent, elements: any[]) => {
             if (elements.length > 0) {
@@ -153,7 +169,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
               this.showCategoryDetails(category);
             }
           },
-        }
+        },
       });
     } catch (error) {
       console.error('Error updating pie chart:', error);
@@ -162,30 +178,43 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
   async createMonthlyExpensesChart() {
     const expenses = await this.expenseService.getExpenses();
-    const monthlyIncome = await this.userService.getUserIncome() || 0;
+    const monthlyIncome = (await this.userService.getUserIncome()) || 0;
     const monthlyTotals = this.calculateMonthlyTotals(expenses);
     const isDarkMode = document.body.classList.contains('dark-mode');
 
-    const ctx = document.getElementById('monthlyExpensesChart') as HTMLCanvasElement;
+    const ctx = document.getElementById(
+      'monthlyExpensesChart'
+    ) as HTMLCanvasElement;
     this.barChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
         ],
         datasets: [
           {
             label: 'Monthly Expenses',
             data: monthlyTotals,
-            backgroundColor: monthlyTotals.map(total => 
-              total > monthlyIncome 
-                ? 'rgba(239, 68, 68, 0.5)'  // Red for exceeding income
-                : 'rgba(147, 51, 234, 0.5)' // Purple for normal
+            backgroundColor: monthlyTotals.map(
+              (total) =>
+                total > monthlyIncome
+                  ? 'rgba(239, 68, 68, 0.5)' // Red for exceeding income
+                  : 'rgba(147, 51, 234, 0.5)' // Purple for normal
             ),
-            borderColor: monthlyTotals.map(total => 
-              total > monthlyIncome 
-                ? 'rgba(239, 68, 68, 1)' 
+            borderColor: monthlyTotals.map((total) =>
+              total > monthlyIncome
+                ? 'rgba(239, 68, 68, 1)'
                 : 'rgba(147, 51, 234, 1)'
             ),
             borderWidth: 1,
@@ -198,8 +227,8 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             borderWidth: 2,
             borderDash: [5, 5],
             fill: false,
-            pointStyle: false
-          }
+            pointStyle: false,
+          },
         ],
       },
       options: {
@@ -217,24 +246,28 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             ticks: {
               color: isDarkMode ? '#f7fafc' : '#4a5568',
               font: {
-                weight: 500
-              }
+                weight: 500,
+              },
             },
             grid: {
-              color: isDarkMode ? 'rgba(247, 250, 252, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-            }
+              color: isDarkMode
+                ? 'rgba(247, 250, 252, 0.1)'
+                : 'rgba(0, 0, 0, 0.1)',
+            },
           },
           ['x']: {
             ticks: {
               color: isDarkMode ? '#f7fafc' : '#4a5568',
               font: {
-                weight: 500
-              }
+                weight: 500,
+              },
             },
             grid: {
-              color: isDarkMode ? 'rgba(247, 250, 252, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-            }
-          }
+              color: isDarkMode
+                ? 'rgba(247, 250, 252, 0.1)'
+                : 'rgba(0, 0, 0, 0.1)',
+            },
+          },
         },
         plugins: {
           legend: {
@@ -242,21 +275,24 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             labels: {
               color: isDarkMode ? '#f7fafc' : '#2d3748',
               font: {
-                weight: 500
-              }
-            }
+                weight: 500,
+              },
+            },
           },
           tooltip: {
             callbacks: {
-              label: function(context) {
+              label: function (context) {
                 const value = context.raw as number;
-                if (context.dataset.label === 'Monthly Expenses' && value > monthlyIncome) {
+                if (
+                  context.dataset.label === 'Monthly Expenses' &&
+                  value > monthlyIncome
+                ) {
                   return `${context.dataset.label}: $${value} (Exceeds Income)`;
                 }
                 return `${context.dataset.label}: $${value}`;
-              }
-            }
-          }
+              },
+            },
+          },
         },
       },
     });
@@ -290,9 +326,10 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     this.currentMonthExpenses.forEach((expense) => {
       // Normalize category name (capitalize first letter, lowercase rest)
-      const normalizedCategory = expense.category.charAt(0).toUpperCase() + 
-                               expense.category.slice(1).toLowerCase();
-      
+      const normalizedCategory =
+        expense.category.charAt(0).toUpperCase() +
+        expense.category.slice(1).toLowerCase();
+
       const current = categoryTotals.get(normalizedCategory) || 0;
       categoryTotals.set(normalizedCategory, current + expense.amount);
       totalSpent += expense.amount;
@@ -309,7 +346,9 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     const data = Array.from(categoryTotals.values());
     const backgroundColors = this.generateColors(labels.length);
 
-    const ctx = document.getElementById('monthlyBreakdownChart') as HTMLCanvasElement;
+    const ctx = document.getElementById(
+      'monthlyBreakdownChart'
+    ) as HTMLCanvasElement;
     this.pieChart = new Chart(ctx, {
       type: 'pie',
       data: {
@@ -333,26 +372,26 @@ export class AnalysisComponent implements OnInit, OnDestroy {
               color: isDarkMode ? '#f7fafc' : '#2d3748',
               font: {
                 size: 14,
-                weight: 500
+                weight: 500,
               },
-              padding: 20
-            }
+              padding: 20,
+            },
           },
           tooltip: {
             callbacks: {
-              label: function(context) {
+              label: function (context) {
                 const value = context.raw as number;
                 return `${context.label}: $${value.toFixed(2)}`;
-              }
+              },
             },
             backgroundColor: isDarkMode ? '#2d3748' : '#ffffff',
             titleColor: isDarkMode ? '#f7fafc' : '#2d3748',
             bodyColor: isDarkMode ? '#f7fafc' : '#4a5568',
             padding: 12,
             bodyFont: {
-              size: 14
-            }
-          }
+              size: 14,
+            },
+          },
         },
         onClick: (event: ChartEvent, elements: any[]) => {
           if (elements.length > 0) {
